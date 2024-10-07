@@ -1,25 +1,31 @@
 require('dotenv').config();
 const Note = require("../models/Notes");
 const mongoose = require("mongoose");
-const axios = require("axios"); 
+const axios = require("axios");
 
 
 exports.view = async (req, res) => {
-  
+
   const note = await Note.findById({ _id: req.params.id })
- 
+console.log(note)
 
-if (note) {
-  res.render("dashboard/view", {
-    noteID: req.params.id,
-    Domain:process.env.Domain,
-    note,
-  });
-} else {
-  res.send("This Note Does Not Exist");
-}
+  if (note) {
+if(note.visibility === "Public"){
+    res.render("dashboard/view", {
+      noteID: req.params.id,
+      Domain: process.env.Domain,
+      note,
 
-  
+    });}else{
+
+      res.send("This Note Is Private");
+    }
+
+  } else {
+    res.send("This Note Does Not Exist");
+  }
+
+
 }
 
 exports.dashboard = async (req, res) => {
@@ -41,6 +47,7 @@ exports.dashboard = async (req, res) => {
         $project: {
           title: { $substr: ["$title", 0, 30] },
           body: { $substr: ["$body", 0, 100] },
+          visibility: 1,
         },
       }
     ])
@@ -76,7 +83,7 @@ exports.dashboardViewNote = async (req, res) => {
     res.render("dashboard/view-note", {
       noteID: req.params.id,
       note,
-      Domain:process.env.Domain,
+      Domain: process.env.Domain,
       layout: "../views/layouts/dashboard",
     });
   } else {
@@ -102,12 +109,12 @@ exports.summarizeNote = async (req, res) => {
       }
     });
 
-  
 
-    
+
+
     const summary = response.data.choices[0].message.content;
 
-  
+
     res.json({ summary });
   } catch (error) {
     console.error('Error from OpenAI API:', error.response ? error.response.data : error.message);
@@ -121,7 +128,7 @@ exports.dashboardUpdateNote = async (req, res) => {
   try {
     await Note.findOneAndUpdate(
       { _id: req.params.id },
-      { title: req.body.title, body: req.body.body, updatedAt: Date.now() }
+      { title: req.body.title, body: req.body.body, updatedAt: Date.now(), visibility: req.body.visibility }
     ).where({ user: req.user.id });
     res.redirect("/dashboard");
   } catch (error) {
@@ -130,15 +137,18 @@ exports.dashboardUpdateNote = async (req, res) => {
 };
 
 
+
 exports.dashboardDeleteNote = async (req, res) => {
   try {
-    await Note.deleteOne({ _id: req.params.id }).where({ user: req.user.id });
+    const deleted = await Note.deleteOne({ _id: req.params.id, });
+
+    console.log(`Deleted note with ID: ${req.params.id}`);
     res.redirect("/dashboard");
   } catch (error) {
-    console.log(error);
+    console.error(error); // Log the error for debugging
+    res.status(500).send("An error occurred while trying to delete the note."); // Send an error response
   }
 };
-
 
 
 
@@ -155,6 +165,7 @@ exports.dashboardAddNoteSubmit = async (req, res) => {
   try {
     req.body.user = req.user.id;
     await Note.create(req.body);
+
     res.redirect("/dashboard");
   } catch (error) {
     console.log(error);

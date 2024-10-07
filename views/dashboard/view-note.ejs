@@ -36,7 +36,19 @@
       <textarea class="form-control pt-5 fs-4" id="body" name="body" placeholder="Take a note..."
         rows="12"><%= note.body %></textarea>
     </div>
-
+      <div id="visibility">
+        <div class="form-check form-check-inline">
+          <input class="form-check-input" type="radio" name="visibility" id="private" value="Private" 
+          <% if (note && note.visibility === 'Private') { %> checked <% } %> >
+          <label class="form-check-label" for="private">Private</label>
+        </div>
+        <div class="form-check form-check-inline">
+          <input class="form-check-input" type="radio" name="visibility" id="public" value="Public" 
+          <% if (note && note.visibility === 'Public') { %> checked <% } %> >
+          <label class="form-check-label" for="public">Public</label>
+        </div>
+      </div>
+  
     <div class="form-group d-flex justify-content-between">
       <button type="submit" class="btn btn-primary btn-lg">Update</button>
       <div> <button type="button" class="btn btn-primary btn-lg" id="summarizeButton">
@@ -175,10 +187,10 @@
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-
         <form action="/dashboard/item-delete/<%= noteID %>?_method=DELETE" method="POST" class="position-relative">
           <button type="submit" class="btn btn-primary">Delete Note</button>
         </form>
+      
 
 
 

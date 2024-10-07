@@ -14,6 +14,11 @@ const NoteSchema = new Schema({
     type: String,
     required: true,
   },
+  visibility: {
+    type: String,
+    enum: ['Private', 'Public'],
+    default: 'Private',
+  },
   createdAt: {
     type: Date,
     default: Date.now()

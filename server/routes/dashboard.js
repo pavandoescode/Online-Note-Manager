@@ -15,4 +15,5 @@ router.post('/dashboard/add', isLoggedIn, dashboardController.dashboardAddNoteSu
 router.get('/dashboard/search', isLoggedIn, dashboardController.dashboardSearch);
 router.post('/dashboard/search', isLoggedIn, dashboardController.dashboardSearchSubmit);
 router.post('/dashboard/summarize', dashboardController.summarizeNote);
+
 module.exports = router;
