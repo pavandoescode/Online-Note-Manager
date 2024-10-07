@@ -1,5 +1,7 @@
+require('dotenv').config();
 const Note = require("../models/Notes");
 const mongoose = require("mongoose");
+const axios = require("axios"); 
 
 
 exports.view = async (req, res) => {
@@ -10,6 +12,7 @@ exports.view = async (req, res) => {
 if (note) {
   res.render("dashboard/view", {
     noteID: req.params.id,
+    Domain:process.env.Domain,
     note,
   });
 } else {
@@ -73,12 +76,45 @@ exports.dashboardViewNote = async (req, res) => {
     res.render("dashboard/view-note", {
       noteID: req.params.id,
       note,
+      Domain:process.env.Domain,
       layout: "../views/layouts/dashboard",
     });
   } else {
     res.send("Something went wrong.");
   }
 };
+
+exports.summarizeNote = async (req, res) => {
+  const apiKey = process.env.OpenAI_API_KEY;
+  const noteContent = req.body.text;
+
+  try {
+    const response = await axios.post('https://api.openai.com/v1/chat/completions', {
+      model: 'gpt-3.5-turbo',
+      messages: [
+        { role: 'system', content: 'You are an assistant that summarizes text and makes key points in a concise way.' },
+        { role: 'user', content: noteContent }
+      ],
+    }, {
+      headers: {
+        'Authorization': `Bearer ${apiKey}`,
+        'Content-Type': 'application/json'
+      }
+    });
+
+  
+
+    
+    const summary = response.data.choices[0].message.content;
+
+  
+    res.json({ summary });
+  } catch (error) {
+    console.error('Error from OpenAI API:', error.response ? error.response.data : error.message);
+    res.status(500).json({ error: 'Error summarizing the note.' });
+  }
+};
+
 
 
 exports.dashboardUpdateNote = async (req, res) => {

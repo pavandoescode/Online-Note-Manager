@@ -14,13 +14,15 @@
       <div class="col-12 d-flex flex-column flex-md-row justify-content-between align-items-center">
         <h1 class="h3">View Note</h1>
         <div class="d-flex mt-3 mt-md-0">
-            <button class="btn btn-success me-2" id="copyButton">Copy Link</button>
-            <button type="button" class="btn btn-danger" data-bs-toggle="modal" id="deleteButton" data-bs-target="#deleteModal">
-              Delete
-            </button>
+          <button class="btn btn-success me-2" id="copyButton"><span
+              class="material-symbols-outlined">share</span></button>
+          <button type="button" class="btn btn-danger" data-bs-toggle="modal" id="deleteButton"
+            data-bs-target="#deleteModal">
+            <span class="material-symbols-outlined">delete</span>
+          </button>
         </div>
-    </div>
-    
+      </div>
+
     </div>
   </div>
 
@@ -35,26 +37,112 @@
         rows="12"><%= note.body %></textarea>
     </div>
 
-    <div class="form-group">
-      <button type="submit" class="btn btn-primary btn-lg w-md-auto">Update</button>
+    <div class="form-group d-flex justify-content-between">
+      <button type="submit" class="btn btn-primary btn-lg">Update</button>
+      <div> <button type="button" class="btn btn-primary btn-lg" id="summarizeButton">
+          <svg width="24" height="32" viewBox="0 0 91 83" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path
+              d="M60.1041 30.4056L52.2916 28.1017C42.523 25.221 34.8831 17.581 32.0023 7.81243L29.6985 0L27.5168 7.46743C24.5469 17.6325 16.4376 25.4787 6.18017 28.1119L2.02656e-06 29.6985L7.81243 32.0023C17.581 34.8831 25.221 42.523 28.1017 52.2916L30.4056 60.1041L31.9921 53.9239C34.6254 43.6665 42.4716 35.5572 52.6367 32.5873L60.1041 30.4056Z"
+              fill="white" />
+            <path
+              d="M90.1949 61.3457L89.3791 61.1051C79.6105 58.2244 71.9705 50.5844 69.0898 40.8158L68.8492 40L68.5738 40.9428C65.7101 50.7444 57.8907 58.3101 48 60.8492L48.8158 61.0898C58.5844 63.9705 66.2244 71.6105 69.1051 81.3791L69.3457 82.1949C71.8847 72.3041 79.4504 64.4848 89.2521 61.6211L90.1949 61.3457Z"
+              fill="white" />
+          </svg> Summarize
+        </button>
+
+      </div>
+
     </div>
-  </form>
+
 
 </div>
 
 
+<span style="display: none;" id="textToCopy">
+  <%= Domain %>/dashboard/view/<%= noteID %>
+</span>
 
-<span style="display: none;" id="textToCopy">https://online-note-manager.onrender.com/dashboard/view/<%= noteID %></span>
+
+
+<div class="modal fade" tabindex="-1" role="dialog" id="summaryModal">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Summary</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <div id="summaryLoader" class="loader" style="display: none;"></div>
+        <div id="summaryContent" style="display: none;">
+          <p id="summaryText"></p>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" id="cancelButton">Cancel</button>
+        <button type="button" class="btn btn-primary" id="useButton">Use</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
 
 
 <script>
+  document.addEventListener('DOMContentLoaded', function () {
+    document.getElementById('summarizeButton').addEventListener('click', function () {
+      const noteContent = document.getElementById('body').value;
+
+
+      const summaryModal = new bootstrap.Modal(document.getElementById('summaryModal'));
+      summaryModal.show();
+      document.getElementById('summaryLoader').style.display = 'block';
+      document.getElementById('summaryContent').style.display = 'none';
+
+
+      fetch('/dashboard/summarize', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ text: noteContent }),
+      })
+        .then(response => response.json())
+        .then(data => {
+          console.log('API response:', data);
+
+          if (data.summary) {
+            document.getElementById('summaryLoader').style.display = 'none';
+            document.getElementById('summaryContent').style.display = 'block';
+            document.getElementById('summaryText').innerText = data.summary;
+
+            document.getElementById('useButton').onclick = function () {
+              document.getElementById('body').value = data.summary;
+              summaryModal.hide();
+            };
+          } else {
+            document.getElementById('summaryLoader').style.display = 'none';
+            document.getElementById('summaryContent').style.display = 'block';
+            document.getElementById('summaryText').innerText = 'Error: No summary found.';
+          }
+        })
+        .catch(err => {
+          console.log('Fetch error:', err);
+          document.getElementById('summaryLoader').style.display = 'none';
+          document.getElementById('summaryContent').style.display = 'block';
+          document.getElementById('summaryText').innerText = 'Error fetching summary. Please try again later.';
+        });
+    });
+  });
+
   document.getElementById('copyButton').addEventListener('click', function () {
-  
-    
+
+
     var text = document.getElementById('textToCopy').innerText;
 
-  
-    
+
+
     var tempTextarea = document.createElement('textarea');
     tempTextarea.value = text;
     document.body.appendChild(tempTextarea);
@@ -62,8 +150,8 @@
     document.execCommand('copy');
     document.body.removeChild(tempTextarea);
 
- 
-    
+
+
     alert('Link Copied');
   });
 </script>

@@ -92,3 +92,28 @@ h1,h2,h3,h4,h5,h6 {
   right: -50px;
   bottom: -30px;
 }
+
+
+.loader {
+
+  width: 120px; 
+  height: 120px; 
+  background-image: url('../img/motion-blur-2.svg');
+  background-size: contain; 
+  background-repeat: no-repeat; 
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  size: 55px;
+}
+
+.material-symbols-outlined {
+  display: flex; 
+  justify-content: center; 
+  align-items: center; 
+  height: 26px; 
+}
+
+.material-symbols-outlined {
+  font-size: 24px; 
+}
