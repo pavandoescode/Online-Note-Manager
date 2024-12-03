@@ -117,7 +117,7 @@
         <p>Share this note via:</p>
         <div class="d-flex flex-wrap justify-content-between">
           <button class="btn btn-outline-primary me-2 mb-2" type="button" id="copyLinkButton">Copy Link</button>
-          <button class="btn btn-primary me-2 mb-2" id="shareFacebook">Facebook</button>
+          <!-- <button class="btn btn-primary me-2 mb-2" id="shareFacebook">Facebook</button> -->
           <button class="btn btn-info me-2 mb-2" id="shareTwitter">Twitter</button>
           <button class="btn btn-danger me-2 mb-2" id="shareLinkedIn">LinkedIn</button>
           <button class="btn btn-success me-2 mb-2" id="shareWhatsApp">WhatsApp</button>
@@ -186,14 +186,14 @@
       }
     });
 
-    document.getElementById('shareFacebook').addEventListener('click', function (event) {
-      event.preventDefault();
-      if (shareUrl) {
-        window.open(`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(shareUrl)}`, '_blank');
-      } else {
-        alert('Invalid share URL');
-      }
-    });
+    // document.getElementById('shareFacebook').addEventListener('click', function (event) {
+    //   event.preventDefault();
+    //   if (shareUrl) {
+    //     window.open(`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(shareUrl)}`, '_blank');
+    //   } else {
+    //     alert('Invalid share URL');
+    //   }
+    // });
 
     document.getElementById('shareTwitter').addEventListener('click', function (event) {
       event.preventDefault();
